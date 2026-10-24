@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cuestionario de Premedicina · Bloque 1</title>
+<style>
+:root{--ink:#233047;--muted:#64748b;--accent:#287d78;--accent-light:#e7f5f2;--paper:#fff;--bg:#f3f6fa;--line:#dbe3ec;--good:#187447;--bad:#b42318}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{background:linear-gradient(135deg,#183b4e,#287d78);color:white;padding:32px 18px}
+.head{max-width:900px;margin:auto}
+.kicker{text-transform:uppercase;letter-spacing:.12em;font-size:.78rem;font-weight:700;opacity:.85}
+h1{font-size:clamp(1.7rem,4vw,2.5rem);line-height:1.15;margin:.45rem 0}
+header p{margin:.5rem 0 0;max-width:650px;color:#e7f2f4}
+main{max-width:900px;margin:24px auto;padding:0 14px 48px}
+.notice,.result{background:white;border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:18px}
+.progressrow{display:flex;justify-content:space-between;gap:12px;align-items:center;color:var(--muted);font-size:.92rem}
+.progress{height:8px;background:#e5eaf0;border-radius:99px;overflow:hidden;margin-top:10px}
+.progressbar{height:100%;width:0;background:var(--accent);transition:width .2s}
+.question{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px;margin:16px 0;box-shadow:0 3px 12px rgba(25,45,70,.04)}
+.qtitle{font-weight:750;margin:0 0 14px;font-size:1.04rem}
+.options{display:grid;gap:9px}
+.option{display:flex;gap:11px;align-items:flex-start;border:1px solid var(--line);border-radius:11px;padding:11px 12px;cursor:pointer;transition:background .15s,border-color .15s}
+.option:hover{border-color:#88bdb7;background:#f8fcfb}
+.option input{margin-top:5px;accent-color:var(--accent);flex-shrink:0}
+.option.correct{border-color:#64b68b;background:#eefaf2}
+.option.incorrect{border-color:#e6a09a;background:#fff2f0}
+.feedback{display:none;margin-top:13px;border-radius:10px;padding:12px 14px;font-size:.95rem}
+.feedback.show{display:block}
+.feedback.good{background:#eefaf2;color:#155c38}
+.feedback.bad{background:#fff2f0;color:#8f2119}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0}
+button{font:inherit;font-weight:700;border:0;border-radius:11px;padding:12px 18px;cursor:pointer}
+.primary{background:var(--accent);color:white}
+.secondary{background:white;color:var(--ink);border:1px solid var(--line)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.result{display:none;border-top:5px solid var(--accent)}
+.result h2{margin:.1rem 0 .5rem}
+.score{font-size:2rem;font-weight:800;color:var(--accent)}
+.small{font-size:.9rem;color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:.85rem;padding:8px 16px 28px}
+@media(min-width:700px){.question{padding:23px}.option{padding:12px 14px}}
+@media print{body{background:white}.question,.notice,.result{box-shadow:none;break-inside:avoid}header{background:white;color:var(--ink);padding:15px 0}header p{color:var(--ink)}.actions{display:none}}
+</style>
+</head>
+<body>
+<header><div class="head">
+<div class="kicker">Premedicina · Cuestionario interactivo</div>
+<h1>Examen de Premedicina</h1>
+<p>Bloque 1 · Preguntas 1–20. Selecciona una respuesta por pregunta. La retroalimentación aparecerá después de que elijas una opción.</p>
+</div></header>
+<main>
+<section class="notice">
+<div class="progressrow"><span id="progressText">Respondidas: 0 de 20</span><span id="percentText">0%</span></div>
+<div class="progress"><div class="progressbar" id="progressbar"></div></div>
+<p class="small">Consejo: contesta sin consultar tus apuntes. Al finalizar podrás ver tu calificación y revisar las respuestas.</p>
+</section>
+<form id="quiz" autocomplete="off"></form>
+<div class="actions">
+<button type="button" class="primary" id="finish">Finalizar y ver calificación</button>
+<button type="button" class="secondary" id="reset">Volver a empezar</button>
+</div>
+<section class="result" id="result" aria-live="polite">
+<h2>Resultado del examen</h2><div class="score" id="score"></div><p id="resultText"></p><p id="unanswered" class="small"></p>
+<button type="button" class="secondary" id="review">Ir a la primera pregunta sin responder</button>
+</section>
+</main>
+<footer>Material de práctica académica · Premedicina</footer>
+<script>
+const questions = [
+{q:"De acuerdo con la definición de salud de la OMS presentada en tus materiales, ¿cuál de las siguientes afirmaciones es correcta?",o:["La salud consiste exclusivamente en no presentar enfermedades diagnosticadas.","La salud comprende el bienestar físico, mental y social, y no solamente la ausencia de enfermedad.","La salud depende principalmente del funcionamiento adecuado de los órganos internos."],a:1,f:["La salud no se limita a la ausencia de una enfermedad diagnosticada.","La definición integral incluye bienestar físico, mental y social, además de considerar que la salud no es solamente la ausencia de enfermedad.","El funcionamiento corporal es importante, pero por sí solo no abarca las dimensiones mental y social."]},
+{q:"Un paciente presenta una temperatura corporal de 39 °C, pero también refiere dolor de cabeza. ¿Cuál de las siguientes manifestaciones corresponde a un signo?",o:["La temperatura corporal de 39 °C.","El dolor de cabeza.","La sensación de debilidad."],a:0,f:["La temperatura puede medirse objetivamente, por lo que es un signo.","El dolor de cabeza es una experiencia subjetiva que refiere el paciente; es un síntoma.","La sensación de debilidad es subjetiva y la comunica el paciente; es un síntoma."]},
+{q:"En la tríada ecológica, ¿qué elemento corresponde al organismo susceptible de desarrollar una enfermedad?",o:["El agente causal.","El ambiente.","El huésped."],a:2,f:["El agente causal es el factor capaz de producir la enfermedad.","El ambiente reúne factores externos que pueden favorecer o dificultar la aparición de la enfermedad.","El huésped es el organismo susceptible de desarrollar la enfermedad."]},
+{q:"Una campaña de vacunación se realiza en una comunidad para evitar que las personas contraigan una enfermedad infecciosa. ¿A qué nivel de prevención corresponde principalmente esta intervención?",o:["Prevención terciaria.","Prevención primaria.","Prevención secundaria."],a:1,f:["La prevención terciaria busca reducir secuelas, discapacidad o recaídas cuando la enfermedad ya está establecida.","La prevención primaria actúa antes de que aparezca la enfermedad; la vacunación ayuda a prevenirla.","La prevención secundaria busca detectar e intervenir tempranamente cuando ya hay indicios o sospecha."]},
+{q:"Un paciente adquiere una infección, pero todavía no presenta signos ni síntomas. Según la historia natural de la enfermedad, ¿en qué etapa se encuentra?",o:["Periodo patogénico subclínico.","Periodo prepatogénico.","Desenlace de cronicidad."],a:0,f:["En la etapa subclínica la enfermedad ya comenzó, pero aún no se manifiesta con signos ni síntomas perceptibles.","En el periodo prepatogénico todavía no ha comenzado la enfermedad; interactúan agente, huésped y ambiente.","La cronicidad es un desenlace en el que la enfermedad persiste durante un periodo prolongado."]},
+{q:"¿Cuál es la diferencia fundamental entre anatomía y fisiología?",o:["La anatomía estudia las enfermedades y la fisiología estudia los medicamentos.","La anatomía estudia los procesos químicos y la fisiología estudia exclusivamente los tejidos.","La anatomía estudia la estructura del cuerpo y la fisiología estudia su funcionamiento."],a:2,f:["La anatomía se centra en las estructuras corporales, no en estudiar las enfermedades como definición principal.","La anatomía no estudia solo procesos químicos y la fisiología no se limita a los tejidos.","La anatomía estudia la forma y estructura; la fisiología estudia cómo funcionan esas estructuras."]},
+{q:"En posición anatómica, ¿cómo deben colocarse las palmas de las manos?",o:["Orientadas hacia atrás.","Orientadas hacia adelante.","Orientadas hacia los muslos, con los dedos flexionados."],a:1,f:["En la posición anatómica de referencia, las palmas no miran hacia atrás.","La posición anatómica se describe de pie, mirando al frente, con los brazos a los lados y las palmas hacia adelante.","Los brazos están a los lados, pero las palmas deben orientarse hacia adelante y los dedos permanecer extendidos."]},
+{q:"Un corte anatómico divide el cuerpo en una porción superior y otra inferior. ¿Qué plano se utilizó?",o:["Transversal u horizontal.","Sagital.","Frontal o coronal."],a:0,f:["El plano transversal divide el cuerpo en porciones superior e inferior.","El plano sagital divide el cuerpo en derecha e izquierda.","El plano frontal o coronal divide el cuerpo en porciones anterior y posterior."]},
+{q:"¿Cuál de las siguientes estructuras pertenece al sistema nervioso central?",o:["Los nervios periféricos.","Los ganglios sensitivos periféricos.","El encéfalo y la médula espinal."],a:2,f:["Los nervios periféricos forman parte del sistema nervioso periférico.","Los ganglios sensitivos periféricos pertenecen al sistema nervioso periférico.","El sistema nervioso central está formado por el encéfalo y la médula espinal."]},
+{q:"¿Qué parte de la neurona recibe principalmente información procedente de otras células?",o:["El axón.","Las dendritas.","La vaina de mielina."],a:1,f:["El axón conduce el impulso nervioso desde el cuerpo celular hacia otras células.","Las dendritas reciben información de otras células y la conducen hacia el soma.","La vaina de mielina aumenta la velocidad de conducción del impulso nervioso."]},
+{q:"¿Cuál es la función principal del sistema endocrino?",o:["Producir y liberar hormonas que regulan procesos del organismo.","Transportar oxígeno mediante los glóbulos rojos.","Filtrar la sangre para producir orina."],a:0,f:["El sistema endocrino produce y libera hormonas que regulan funciones y contribuyen a mantener la homeostasis.","El transporte de oxígeno por los glóbulos rojos corresponde a una función de la sangre.","La filtración de la sangre y la producción de orina corresponden principalmente al sistema urinario."]},
+{q:"¿Qué hormona favorece la reabsorción de agua en los riñones y contribuye a regular el equilibrio hídrico?",o:["Insulina.","Prolactina.","Hormona antidiurética (ADH)."],a:2,f:["La insulina participa principalmente en la regulación de la glucosa sanguínea.","La prolactina participa especialmente en la producción de leche.","La ADH favorece la reabsorción de agua en los riñones y ayuda a regular el equilibrio hídrico."]},
+{q:"¿En qué órgano maduran los linfocitos T?",o:["En el bazo.","En el timo.","En los ganglios linfáticos."],a:1,f:["El bazo filtra la sangre y participa en la respuesta inmunitaria.","Los linfocitos T maduran en el timo.","Los ganglios linfáticos filtran la linfa y participan en la respuesta inmunitaria."]},
+{q:"¿Cuál es una función importante del sistema linfático?",o:["Devolver líquido de los tejidos a la circulación sanguínea y participar en la defensa inmunitaria.","Producir la bilis necesaria para digerir las grasas.","Generar los impulsos eléctricos que controlan los músculos esqueléticos."],a:0,f:["El sistema linfático devuelve líquido y proteínas al torrente sanguíneo y participa en la defensa inmunitaria.","La bilis se produce en el hígado y se almacena en la vesícula biliar.","Los impulsos que controlan los músculos esqueléticos se originan en el sistema nervioso."]},
+{q:"¿Cuál de las siguientes características distingue a las células procariotas de las eucariotas?",o:["Las procariotas poseen un núcleo rodeado por membrana.","Las procariotas carecen de un núcleo verdadero y su ADN se encuentra en una región llamada nucleoide.","Las procariotas poseen mitocondrias para producir ATP."],a:1,f:["Las procariotas no tienen un núcleo delimitado por una membrana.","En las procariotas, el ADN se localiza en una región llamada nucleoide; no está encerrado en un núcleo verdadero.","Las procariotas carecen de mitocondrias; su producción de ATP no ocurre en ese orgánulo."]},
+{q:"En el modelo de mosaico fluido, ¿qué estructura constituye la base de la membrana celular?",o:["Una capa única de proteínas.","Una pared rígida formada exclusivamente por celulosa.","Una bicapa de lípidos en la que se encuentran proteínas y carbohidratos."],a:2,f:["La membrana no consiste en una sola capa de proteínas.","La celulosa no forma exclusivamente la membrana celular animal; es característica de la pared celular de plantas y otros organismos.","El modelo de mosaico fluido describe una bicapa lipídica con proteínas y carbohidratos asociados y cierta movilidad."]},
+{q:"Una célula se coloca en una solución hipertónica. ¿Qué ocurrirá generalmente con ella si la membrana permite el movimiento de agua?",o:["El agua saldrá de la célula y esta perderá volumen.","El agua entrará en la célula y esta aumentará de volumen.","No habrá movimiento neto de agua y conservará su volumen."],a:0,f:["En un medio hipertónico, la concentración de solutos fuera de la célula es mayor y el agua tiende a salir; la célula pierde volumen.","En un medio hipertónico, el agua no tiende a entrar; eso se relaciona con un medio hipotónico.","La ausencia de movimiento neto de agua corresponde a condiciones isotónicas, no hipertónicas."]},
+{q:"¿Cuál es la función principal de los carbohidratos en el organismo?",o:["Almacenar la información hereditaria.","Proporcionar una fuente de energía para las células.","Formar exclusivamente las membranas celulares."],a:1,f:["La información hereditaria se almacena principalmente en los ácidos nucleicos, como el ADN.","Los carbohidratos, como la glucosa, son una fuente importante de energía celular.","Los carbohidratos no forman exclusivamente las membranas; estas se basan en una bicapa lipídica con proteínas y otros componentes."]},
+{q:"¿Qué tipo de reacción metabólica descompone moléculas grandes en otras más pequeñas y libera energía?",o:["Anabolismo.","Síntesis proteica.","Catabolismo."],a:2,f:["El anabolismo construye moléculas complejas a partir de moléculas más simples y requiere energía.","La síntesis proteica es un proceso de construcción de proteínas, por lo que es anabólico.","El catabolismo descompone moléculas complejas en otras más simples y suele liberar energía."]},
+{q:"¿En qué parte de la célula eucariota ocurre principalmente el ciclo de Krebs?",o:["En la matriz mitocondrial.","En el núcleo.","En el aparato de Golgi."],a:0,f:["En células eucariotas, las reacciones del ciclo de Krebs ocurren principalmente en la matriz mitocondrial.","El núcleo contiene la mayor parte del ADN celular y no es el sitio principal del ciclo de Krebs.","El aparato de Golgi modifica y distribuye proteínas y lípidos; no es el sitio del ciclo de Krebs."]}
+];
+const letters=["A","B","C"];
+const form=document.getElementById("quiz");
+let answered=new Set();
+let submitted=false;
+function render(){
+  form.innerHTML="";
+  questions.forEach((item,i)=>{
+    const section=document.createElement("section");
+    section.className="question";
+    section.id="q"+(i+1);
+    const title=document.createElement("p");
+    title.className="qtitle";
+    title.textContent=(i+1)+". "+item.q;
+    section.appendChild(title);
+    const options=document.createElement("div");options.className="options";
+    item.o.forEach((opt,j)=>{
+      const label=document.createElement("label");label.className="option";label.dataset.index=j;
+      const radio=document.createElement("input");radio.type="radio";radio.name="q"+i;radio.value=j;
+      radio.setAttribute("aria-label","Opción "+letters[j]);
+      const text=document.createElement("span");text.textContent=letters[j]+") "+opt;
+      label.append(radio,text);options.appendChild(label);
+      radio.addEventListener("change",()=>choose(i,j));
+    });
+    section.appendChild(options);
+    const fb=document.createElement("div");fb.className="feedback";fb.id="fb"+i;fb.setAttribute("aria-live","polite");section.appendChild(fb);
+    form.appendChild(section);
+  });
+}
+function choose(i,j){
+  if(submitted)return;
+  answered.add(i);
+  const item=questions[i],section=document.getElementById("q"+(i+1)),fb=document.getElementById("fb"+i);
+  section.querySelectorAll(".option").forEach((el,k)=>{
+    el.classList.remove("correct","incorrect");
+    if(k===item.a)el.classList.add("correct");
+    if(k===j&&j!==item.a)el.classList.add("incorrect");
+  });
+  fb.className="feedback show "+(j===item.a?"good":"bad");
+  fb.textContent=(j===item.a?"¡Muy bien! ":"Revisa este concepto. ")+item.f[j];
+  updateProgress();
+}
+function updateProgress(){
+  document.getElementById("progressText").textContent="Respondidas: "+answered.size+" de "+questions.length;
+  document.getElementById("percentText").textContent=Math.round(answered.size/questions.length*100)+"%";
+  document.getElementById("progressbar").style.width=(answered.size/questions.length*100)+"%";
+}
+document.getElementById("finish").addEventListener("click",()=>{
+  const missing=questions.map((_,i)=>i).filter(i=>!answered.has(i));
+  if(missing.length){
+    const ok=confirm("Todavía tienes "+missing.length+" pregunta(s) sin responder. ¿Quieres finalizar de todos modos?");
+    if(!ok){document.getElementById("q"+(missing[0]+1)).scrollIntoView({behavior:"smooth",block:"center"});return;}
+  }
+  submitted=true;
+  let score=0;
+  questions.forEach((item,i)=>{
+    const selected=form.querySelector('input[name="q'+i+'"]:checked');
+    if(selected&&Number(selected.value)===item.a)score++;
+    form.querySelectorAll('input[name="q'+i+'"]').forEach(r=>r.disabled=true);
+    const fb=document.getElementById("fb"+i);
+    if(!selected){fb.className="feedback show bad";fb.textContent="Sin responder. Respuesta correcta: "+letters[item.a]+") "+item.o[item.a]+". "+item.f[item.a];}
+    else {fb.classList.add("show");}
+  });
+  document.getElementById("score").textContent=score+" / "+questions.length+" · "+Math.round(score/questions.length*100)+"%";
+  document.getElementById("resultText").textContent=score>=18?"¡Excelente dominio de estos temas!":score>=14?"Buen avance. Repasa las explicaciones de las preguntas que fallaste.":"Te recomendamos repasar los conceptos y volver a intentarlo.";
+  document.getElementById("unanswered").textContent=missing.length?"Preguntas sin responder: "+missing.map(i=>i+1).join(", "):"Contestaste todas las preguntas.";
+  document.getElementById("result").style.display="block";
+  document.getElementById("finish").disabled=true;
+  document.getElementById("result").scrollIntoView({behavior:"smooth",block:"start"});
+});
+document.getElementById("reset").addEventListener("click",()=>{
+  if(!confirm("¿Quieres borrar tus respuestas y comenzar de nuevo?"))return;
+  answered=new Set();submitted=false;
+  document.getElementById("result").style.display="none";
+  document.getElementById("finish").disabled=false;
+  render();updateProgress();window.scrollTo({top:0,behavior:"smooth"});
+});
+document.getElementById("review").addEventListener("click",()=>{
+  const missing=questions.findIndex((_,i)=>!form.querySelector('input[name="q'+i+'"]:checked'));
+  if(missing>=0)document.getElementById("q"+(missing+1)).scrollIntoView({behavior:"smooth",block:"center"});
+  else document.getElementById("q1").scrollIntoView({behavior:"smooth",block:"start"});
+});
+render();updateProgress();
+</script>
+</body>
+</html>
